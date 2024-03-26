@@ -7,8 +7,7 @@ let board = [
   [0, 0, 0, 0],
 ];
 
-let score = 0;
-
+let score = 0 ;
 function startGame() {
   board = [
     [0, 0, 0, 0],
@@ -20,6 +19,14 @@ function startGame() {
   addNewTile();
   updateBoard();
 }
+
+function resetScore() {
+  score = 0; // Reset skor ke 0
+  scoreEl.innerText = score; // Perbarui tampilan skor
+}
+const resetScoreBtn = document.getElementById("new-game-btn");
+resetScoreBtn.addEventListener("click", resetScore);
+
 
 function addNewTile() {
   const emptyTiles = [];
@@ -81,6 +88,36 @@ function moveTiles(direction) {
   const rowIndices = direction === "up" ? [0, 1, 2, 3] : [3, 2, 1, 0];
   const colIndices = direction === "left" ? [0, 1, 2, 3] : [3, 2, 1, 0];
 
+  let canMove = false; // Variabel untuk memeriksa apakah masih ada gerakan yang mungkin
+
+  // Looping untuk memeriksa apakah masih ada gerakan yang mungkin sebelum pemindahan ubin
+  for (let row of rowIndices) {
+    for (let col of colIndices) {
+      const currentValue = board[row][col];
+      if (currentValue === 0) {
+        canMove = true;
+      } else {
+        // Periksa apakah ubin saat ini dapat digabungkan dengan ubin sebelahnya
+        if (
+          (direction === "up" && row > 0 && board[row - 1][col] === currentValue) ||
+          (direction === "down" && row < 3 && board[row + 1][col] === currentValue) ||
+          (direction === "left" && col > 0 && board[row][col - 1] === currentValue) ||
+          (direction === "right" && col < 3 && board[row][col + 1] === currentValue)
+        ) {
+          canMove = true;
+        }
+      }
+    }
+  }
+
+  // Jika tidak ada gerakan yang mungkin, tampilkan "Game Over" dan reset permainan
+  if (!canMove) {
+    alert("Game Over!");
+    startGame();
+    return;
+  }
+
+  // Jika masih ada gerakan yang mungkin, lakukan pemindahan ubin seperti biasa
   for (let row of rowIndices) {
     for (let col of colIndices) {
       const currentValue = board[row][col];
@@ -140,6 +177,7 @@ function moveTiles(direction) {
     updateBoard();
   }
 }
+
 
 document.addEventListener("keydown", function (event) {
   console.log(event.key);
